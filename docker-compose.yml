@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+  db:
+    container_name: database
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hero
+    network_mode: "host"
+  app:
+    container_name: application
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    network_mode: "host"
