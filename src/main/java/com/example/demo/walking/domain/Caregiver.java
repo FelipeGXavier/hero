@@ -26,12 +26,17 @@ public class Caregiver {
 
     @Convert(converter = EmailConverter.class)
     private Email email;
+
     private String name;
 
     private Caregiver(Telephone telephone, Email email, String name) {
         this.telephone = telephone;
         this.email = email;
         this.name = name;
+    }
+
+    public void acceptWalking(Walking walking) {
+        walking.acceptWalk(this);
     }
 
     public static Caregiver of(

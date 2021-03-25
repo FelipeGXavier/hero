@@ -2,8 +2,12 @@ package com.example.demo.walking.domain;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,6 +16,11 @@ import java.util.List;
 @Getter
 public class Walking {
 
+    static final int THIRTY_MINUTES_WALKING_BASE_PRICE = 25;
+    static final int SIXTY_MINUTES_WALKING_BASE_PRICE = 35;
+    static final int THIRTY_MINUTES_WALKING_ADDITIONAL_PRICE = 15;
+    static final int SIXTY_MINUTES_WALKING_ADDITIONAL_PRICE = 20;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,14 +28,17 @@ public class Walking {
     @Column(nullable = false)
     private LocalDateTime scheduledDate;
 
-    private float price;
+    private double price;
 
     @Column(nullable = false)
     private int duration;
 
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
+
+    @Enumerated(EnumType.ORDINAL)
     private WalkingStatus status;
+
     private String latitude;
     private String longitude;
 
@@ -39,20 +51,70 @@ public class Walking {
             inverseJoinColumns = @JoinColumn(name = "pet_id", referencedColumnName = "id"))
     private List<Pet> pets;
 
-    private Walking(LocalDateTime scheduledDate, float price, int duration, LocalDateTime startDate, LocalDateTime finishDate, WalkingStatus status, String latitude, String longitude, Caregiver caregiver, List<Pet> pets) {
+    private Walking(
+            @NonNull LocalDateTime scheduledDate,
+            @Positive int duration,
+            @NotBlank String latitude,
+            @NotBlank String longitude,
+            List<Pet> pets) {
         this.scheduledDate = scheduledDate;
-        this.price = price;
         this.duration = duration;
-        this.startDate = startDate;
-        this.finishDate = finishDate;
-        this.status = status;
+        this.status = WalkingStatus.PENDING;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.caregiver = caregiver;
         this.pets = pets;
+        this.price = this.calculateWalkingPrice();
     }
 
-    static class WalkingBuilder {
+    public void acceptWalk(Caregiver caregiver) {
+        this.status = WalkingStatus.ACCEPTED;
+        this.caregiver = caregiver;
+    }
+
+    public void startWalk() {
+        if (this.startDate == null
+                && this.finishDate == null
+                && this.status == WalkingStatus.ACCEPTED
+                && this.caregiver != null) {
+            this.startDate = LocalDateTime.now();
+        } else {
+            throw new RuntimeException("Error while starting this walking");
+        }
+    }
+
+    public void finishWalk() {
+        if (this.startDate != null
+                && this.finishDate == null
+                && this.status == WalkingStatus.ACCEPTED
+                && this.caregiver != null) {
+            this.finishDate = LocalDateTime.now();
+        } else {
+            throw new RuntimeException("Error while starting this walking");
+        }
+    }
+
+    private double calculateWalkingPrice() {
+        var total = 0.0;
+        var pets = this.pets.size();
+        var duration = this.duration;
+        var additionalPets = pets - 1;
+        if (duration == 30) {
+            total = THIRTY_MINUTES_WALKING_BASE_PRICE;
+            total +=
+                    additionalPets > 0
+                            ? additionalPets * THIRTY_MINUTES_WALKING_ADDITIONAL_PRICE
+                            : 0.0;
+        } else if (duration == 60) {
+            total = SIXTY_MINUTES_WALKING_BASE_PRICE;
+            total +=
+                    additionalPets > 0
+                            ? additionalPets * SIXTY_MINUTES_WALKING_ADDITIONAL_PRICE
+                            : 0.0;
+        }
+        return total;
+    }
+
+    public static class WalkingBuilder {
 
         private LocalDateTime scheduledDate;
         private float price;
@@ -70,28 +132,8 @@ public class Walking {
             return this;
         }
 
-        public WalkingBuilder setPrice(float price) {
-            this.price = price;
-            return this;
-        }
-
         public WalkingBuilder setDuration(int duration) {
             this.duration = duration;
-            return this;
-        }
-
-        public WalkingBuilder setStartDate(LocalDateTime startDate) {
-            this.startDate = startDate;
-            return this;
-        }
-
-        public WalkingBuilder setFinishDate(LocalDateTime finishDate) {
-            this.finishDate = finishDate;
-            return this;
-        }
-
-        public WalkingBuilder setStatus(WalkingStatus status) {
-            this.status = status;
             return this;
         }
 
@@ -115,8 +157,14 @@ public class Walking {
             return this;
         }
 
-        public Walking createWalking() {
-            return new Walking(scheduledDate, price, duration, startDate, finishDate, status, latitude, longitude, caregiver, pets);
+        public Walking build() {
+            Assert.state(pets.size() > 0, "Walking must have at least one dog");
+            Assert.notNull(scheduledDate, "Scheduled date can't be null");
+            Assert.state(
+                    scheduledDate.isAfter(LocalDateTime.now()),
+                    "Scheduled date must be greater than now");
+            Assert.state(duration == 30 || duration == 60, "Duration must be 30 or 60 minutes");
+            return new Walking(scheduledDate, duration, latitude, longitude, pets);
         }
     }
 }

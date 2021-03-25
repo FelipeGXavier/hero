@@ -1,7 +1,5 @@
 package com.example.demo.walking.domain;
 
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
@@ -33,6 +31,10 @@ public class Pet {
         this.breed = breed;
         this.restrictions = restrictions;
         this.owner = owner;
+    }
+
+    public Pet(Long id) {
+        this.id = id;
     }
 
     public static Pet of(String name, String breed, String restrictions, Owner owner) {
