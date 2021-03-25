@@ -11,6 +11,7 @@ public final class CEP {
 
     public CEP(String value) {
         Assert.notNull(value, "CEP can't be null");
+        value = this.replaceAllNonNumeric(value);
         Assert.isTrue(
                 value.length() == CEP_LENGTH, "CEP must have eight characters without slashes");
         this.value = value;
@@ -18,6 +19,11 @@ public final class CEP {
 
     public String getValue() {
         return value;
+    }
+
+    private String replaceAllNonNumeric(String value) {
+        var pattern = "[^0-9]";
+        return value.replaceAll(pattern, "").trim();
     }
 
     @Override
