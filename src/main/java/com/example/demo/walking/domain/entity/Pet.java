@@ -24,6 +24,7 @@ public class Pet {
     @Column(length = 150)
     private String restrictions;
 
+    @Column(nullable = false)
     @ManyToOne private Owner owner;
 
     public Pet(String name, String breed, String restrictions, Owner owner) {

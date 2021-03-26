@@ -37,6 +37,7 @@ public class Walking {
     private LocalDateTime finishDate;
 
     @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
     private WalkingStatus status;
 
     private String latitude;
