@@ -1,4 +1,4 @@
-package com.example.demo.walking.domain;
+package com.example.demo.walking.domain.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

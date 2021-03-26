@@ -1,4 +1,4 @@
-package com.example.demo.walking.domain;
+package com.example.demo.walking.domain.entity;
 
 import com.example.demo.walking.domain.valueobject.CEP;
 import com.example.demo.walking.domain.valueobject.Email;
