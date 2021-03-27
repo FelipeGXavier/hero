@@ -1,6 +1,7 @@
 package com.example.demo.walking.application.usecases;
 
 import com.example.demo.walking.adapters.CreateWalkRequest;
+import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.domain.usecase.CreateWalkingUseCase;
 import com.example.demo.walking.infra.repository.PetRepository;
 import com.example.demo.walking.infra.repository.WalkingRepository;
@@ -20,8 +21,8 @@ public class CreateWalking implements CreateWalkingUseCase {
     }
 
     @Override
-    public void create(CreateWalkRequest request) {
+    public Walking create(CreateWalkRequest request) {
         var walking = request.toEntity(this.petRepository);
-        this.walkingRepository.save(walking);
+        return this.walkingRepository.save(walking);
     }
 }

@@ -3,6 +3,7 @@ package com.example.demo.walking.infra.http;
 import com.example.demo.walking.adapters.CreateWalkRequest;
 import com.example.demo.walking.domain.usecase.CreateWalkingUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class WalkingController {
 
     @PostMapping
     public ResponseEntity<?> createWalk(@RequestBody @Valid CreateWalkRequest request) {
-        this.createWalking.create(request);
-        return ResponseEntity.noContent().build();
+        var walking = this.createWalking.create(request);
+        return new ResponseEntity<>(walking, HttpStatus.CREATED);
     }
 }

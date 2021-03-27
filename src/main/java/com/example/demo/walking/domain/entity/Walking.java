@@ -118,14 +118,9 @@ public class Walking {
     public static class WalkingBuilder {
 
         private LocalDateTime scheduledDate;
-        private float price;
         private int duration;
-        private LocalDateTime startDate;
-        private LocalDateTime finishDate;
-        private WalkingStatus status;
         private String latitude;
         private String longitude;
-        private Caregiver caregiver;
         private List<Pet> pets;
 
         public WalkingBuilder setScheduledDate(LocalDateTime scheduledDate) {
@@ -148,18 +143,13 @@ public class Walking {
             return this;
         }
 
-        public WalkingBuilder setCaregiver(Caregiver caregiver) {
-            this.caregiver = caregiver;
-            return this;
-        }
-
         public WalkingBuilder setPets(List<Pet> pets) {
             this.pets = pets;
             return this;
         }
 
         public Walking build() {
-            Assert.state(pets.size() > 0, "Walking must have at least one dog");
+            Assert.state(pets.size() > 0, "Walking must have at least one pet");
             Assert.notNull(scheduledDate, "Scheduled date can't be null");
             Assert.state(
                     scheduledDate.isAfter(LocalDateTime.now()),

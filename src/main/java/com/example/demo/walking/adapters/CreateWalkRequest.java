@@ -32,7 +32,7 @@ public class CreateWalkRequest {
     public Walking toEntity(PetRepository petRepository) {
         var foundPets = petRepository.findPetsWhereIn(this.pets);
         if (foundPets.size() != this.pets.size()) {
-            throw new RuntimeException("One or more pets were not found");
+            throw new IllegalArgumentException("One or more pets were not found");
         }
         return new Walking.WalkingBuilder()
                 .setPets(foundPets)
