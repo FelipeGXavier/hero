@@ -37,9 +37,9 @@ public class AcceptWalkTest {
         assertEquals(WalkingStatus.ACCEPTED, walkingSpy.getStatus());
     }
 
-    @DisplayName("Try to accept nonexistent walking should throw an exception")
+    @DisplayName("Attempting to accept nonexistent walking should throw an exception")
     @Test
-    public void testRejectWalk() {
+    public void testWalkingNotFound() {
         var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
         var walking =
                 TestFactory.createWalking(LocalDateTime.now().plusDays(1), "-", "-", 30, pets);

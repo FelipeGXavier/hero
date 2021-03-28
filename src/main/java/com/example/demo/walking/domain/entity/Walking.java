@@ -95,7 +95,8 @@ public class Walking {
                 && this.caregiver != null) {
             this.finishDate = LocalDateTime.now();
         } else {
-            throw new RuntimeException("Error while starting this walking");
+            throw new IllegalStateException(
+                    "Error while finishing this walking with id " + this.getId());
         }
     }
 

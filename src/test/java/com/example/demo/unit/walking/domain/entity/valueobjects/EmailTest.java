@@ -1,4 +1,4 @@
-package com.example.demo.unit.walking.domain.valueobjects;
+package com.example.demo.unit.walking.domain.entity.valueobjects;
 
 import com.example.demo.walking.domain.valueobject.Email;
 import org.junit.jupiter.api.DisplayName;

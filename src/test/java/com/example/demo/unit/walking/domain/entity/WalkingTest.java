@@ -133,15 +133,49 @@ public class WalkingTest {
         assertEquals(nowTruncated, truncatedDate);
     }
 
-    @DisplayName("Try to start walking with null caregiver, already started walk or already finished, should throw an exception")
+    @DisplayName(
+            "Attempting to start a walking with null caregiver, already started walk or already finished, should throw an exception")
     @Test
     public void testStartWalkingInconsistentState() {
         var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
-        var walking = TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
         var caregiver = mock(Caregiver.class);
         assertThrows(IllegalStateException.class, walking::startWalk);
         walking.acceptWalk(caregiver);
         walking.startWalk();
         assertThrows(IllegalStateException.class, walking::startWalk);
+    }
+
+    @DisplayName("Should finish walking")
+    @Test
+    public void testFinishWalking() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        walking.acceptWalk(caregiver);
+        walking.startWalk();
+        walking.finishWalk();
+        var truncatedStart = walking.getStartDate().truncatedTo(ChronoUnit.NANOS);
+        var truncatedFinish = walking.getFinishDate().truncatedTo(ChronoUnit.NANOS);
+        assertEquals(WalkingStatus.ACCEPTED, walking.getStatus());
+        assertTrue(truncatedFinish.isAfter(truncatedStart));
+    }
+
+    @DisplayName(
+            "Attempting to end an uninitiated walking, null caregiver or already finished walk should throw an exception")
+    @Test
+    public void testFinishWalkingInconsistentState() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        assertThrows(IllegalStateException.class, walking::finishWalk);
+        walking.acceptWalk(caregiver);
+        assertThrows(IllegalStateException.class, walking::finishWalk);
+        walking.startWalk();
+        walking.finishWalk();
+        assertThrows(IllegalStateException.class, walking::finishWalk);
     }
 }

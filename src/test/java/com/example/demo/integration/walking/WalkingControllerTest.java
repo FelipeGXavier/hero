@@ -189,4 +189,20 @@ public class WalkingControllerTest {
         assertNull(walkingRow.getStartDate());
         assertNull(walkingRow.getFinishDate());
     }
+
+    @DisplayName("Test finish walking")
+    @Test
+    public void testFinishWalking() throws Exception {
+        var pets = this.petRepository.findAll();
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingInsert = this.walkingRepository.save(walking);
+        walkingInsert.acceptWalk(this.loadLoggedUser.loadLoggedUser());
+        walkingInsert.startWalk();
+        this.walkingRepository.save(walkingInsert);
+        this.mockMvc.perform(get("/api/v1/walk/finish/" + walkingInsert.getId())).andExpect(status().isOk());
+        var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
+        assertNotNull(walkingRow.getStartDate());
+        assertNotNull(walkingRow.getFinishDate());
+    }
 }
