@@ -1,11 +1,12 @@
 package com.example.demo.unit.walking.domain.entity;
 
+import com.example.demo.util.TestFactory;
+import com.example.demo.walking.domain.entity.Caregiver;
 import com.example.demo.walking.domain.entity.Pet;
 import com.example.demo.walking.domain.entity.Walking;
+import com.example.demo.walking.domain.entity.WalkingStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 public class WalkingTest {
 
@@ -49,13 +50,8 @@ public class WalkingTest {
                 assertThrows(
                         IllegalStateException.class,
                         () ->
-                                new Walking.WalkingBuilder()
-                                        .setScheduledDate(LocalDateTime.now().plusDays(3L))
-                                        .setLongitude("-")
-                                        .setLatitude("-")
-                                        .setDuration(30)
-                                        .setPets(pets)
-                                        .build());
+                                TestFactory.createWalking(
+                                        LocalDateTime.now().plusDays(1L), "-", "-", 30, pets));
         assertEquals("Walking must have at least one pet", ex.getMessage());
     }
 
@@ -67,13 +63,8 @@ public class WalkingTest {
                 assertThrows(
                         IllegalStateException.class,
                         () ->
-                                new Walking.WalkingBuilder()
-                                        .setScheduledDate(LocalDateTime.now().minusDays(1L))
-                                        .setLongitude("-")
-                                        .setLatitude("-")
-                                        .setDuration(30)
-                                        .setPets(pets)
-                                        .build());
+                                TestFactory.createWalking(
+                                        LocalDateTime.now().minusDays(1L), "-", "-", 30, pets));
         assertEquals("Scheduled date must be greater than now", ex.getMessage());
     }
 
@@ -85,25 +76,44 @@ public class WalkingTest {
                 assertThrows(
                         IllegalStateException.class,
                         () ->
-                                new Walking.WalkingBuilder()
-                                        .setScheduledDate(LocalDateTime.now().plusDays(1L))
-                                        .setLongitude("-")
-                                        .setLatitude("-")
-                                        .setDuration(31)
-                                        .setPets(pets)
-                                        .build());
+                                TestFactory.createWalking(
+                                        LocalDateTime.now().plusDays(1L), "-", "-", 31, pets));
         var ex2 =
                 assertThrows(
                         IllegalStateException.class,
                         () ->
-                                new Walking.WalkingBuilder()
-                                        .setScheduledDate(LocalDateTime.now().plusDays(1L))
-                                        .setLongitude("-")
-                                        .setLatitude("-")
-                                        .setDuration(61)
-                                        .setPets(pets)
-                                        .build());
+                                TestFactory.createWalking(
+                                        LocalDateTime.now().plusDays(1L), "-", "-", 61, pets));
         assertEquals("Duration must be 30 or 60 minutes", ex1.getMessage());
         assertEquals("Duration must be 30 or 60 minutes", ex2.getMessage());
+    }
+
+    @DisplayName("Test accept walk and change status state")
+    @Test
+    public void testAcceptWalking() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        assertEquals(walking.getStatus(), WalkingStatus.PENDING);
+        var caregiver = mock(Caregiver.class);
+        walking.acceptWalk(caregiver);
+        assertEquals(walking.getStatus(), WalkingStatus.ACCEPTED);
+    }
+
+    @DisplayName("Test to try accept a already accepted walk or canceled should throw an exception")
+    @Test
+    public void testAcceptErrorInvalidState() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        walking.acceptWalk(caregiver);
+        var ex1 = assertThrows(IllegalStateException.class, () -> walking.acceptWalk(caregiver));
+        assertEquals("This walk was already accepted or canceled", ex1.getMessage());
+        assertEquals(WalkingStatus.ACCEPTED, walking.getStatus());
+        walking.cancelWalk();
+        var ex2 = assertThrows(IllegalStateException.class, () -> walking.acceptWalk(caregiver));
+        assertEquals("This walk was already accepted or canceled", ex2.getMessage());
+        assertEquals(WalkingStatus.CANCELED, walking.getStatus());
     }
 }

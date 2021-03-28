@@ -68,8 +68,12 @@ public class Walking {
     }
 
     public void acceptWalk(Caregiver caregiver) {
-        this.status = WalkingStatus.ACCEPTED;
-        this.caregiver = caregiver;
+        if (this.getStatus() == WalkingStatus.PENDING && this.getCaregiver() == null) {
+            this.status = WalkingStatus.ACCEPTED;
+            this.caregiver = caregiver;
+        } else {
+            throw new IllegalStateException("This walk was already accepted or canceled");
+        }
     }
 
     public void startWalk() {
@@ -79,7 +83,8 @@ public class Walking {
                 && this.caregiver != null) {
             this.startDate = LocalDateTime.now();
         } else {
-            throw new RuntimeException("Error while starting this walking");
+            throw new IllegalStateException(
+                    "Error while starting this walking with id " + this.getId());
         }
     }
 
@@ -92,6 +97,11 @@ public class Walking {
         } else {
             throw new RuntimeException("Error while starting this walking");
         }
+    }
+
+    // @TODO Add rules to cancel walk
+    public void cancelWalk() {
+        this.status = WalkingStatus.CANCELED;
     }
 
     private double calculateWalkingPrice() {

@@ -10,23 +10,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EmailTest {
 
+    @DisplayName("Test invalid email addresses")
     @ParameterizedTest
     @ValueSource(strings = {"user.nameteste.com", "user.name#teste.com", "@teste.com"})
-    @DisplayName("Test invalid email addresses")
     public void testInvalidAddresses(String address) {
         var ex = assertThrows(IllegalArgumentException.class, () -> new Email(address));
         assertEquals("Invalid email address", ex.getMessage());
     }
 
+    @DisplayName("Test valid email addresses")
     @ParameterizedTest
     @ValueSource(strings = {"user@user.com", "user.name@teste.com", "u@u.com"})
-    @DisplayName("Test valid email addresses")
     public void testValidAddresses(String address) {
         var email = new Email(address);
         assertEquals(email.getValue(), address);
     }
 
-    @DisplayName("Two CEP objects with same value should be equals")
+    @DisplayName("Two Email objects with same value should be equals")
     @Test
     public void testEmailEquals() {
         var val = "u@u.com.br";
@@ -45,11 +45,10 @@ public class EmailTest {
         assertNotEquals(email1, email2);
     }
 
-    @Test
     @DisplayName("Null email should throw and exception")
+    @Test
     public void testNullAddress() {
         var ex = assertThrows(IllegalArgumentException.class, () -> new Email(null));
         assertEquals("Invalid email address", ex.getMessage());
     }
-
 }

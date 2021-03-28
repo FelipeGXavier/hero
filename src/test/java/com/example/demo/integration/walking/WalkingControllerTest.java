@@ -1,30 +1,26 @@
 package com.example.demo.integration.walking;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.demo.walking.adapters.CreateWalkRequest;
-import com.example.demo.walking.domain.entity.Owner;
-import com.example.demo.walking.domain.entity.Pet;
-import com.example.demo.walking.domain.entity.Walking;
-import com.example.demo.walking.domain.entity.WalkingStatus;
+import com.example.demo.util.TestFactory;
+import com.example.demo.walking.common.LoadLoggedUser;
+import com.example.demo.walking.domain.entity.*;
 import com.example.demo.walking.domain.valueobject.CEP;
 import com.example.demo.walking.domain.valueobject.Email;
+import com.example.demo.walking.domain.valueobject.Telephone;
+import com.example.demo.walking.infra.repository.CaregiverRepository;
 import com.example.demo.walking.infra.repository.OwnerRepository;
 import com.example.demo.walking.infra.repository.PetRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.demo.walking.infra.repository.WalkingRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Positive;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,7 +41,10 @@ public class WalkingControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private PetRepository petRepository;
     @Autowired private OwnerRepository ownerRepository;
+    @Autowired private CaregiverRepository caregiverRepository;
+    @Autowired private WalkingRepository walkingRepository;
     @Autowired private ObjectMapper mapper;
+    @Autowired private LoadLoggedUser loadLoggedUser;
 
     @BeforeAll
     public void setup() {
@@ -56,14 +55,17 @@ public class WalkingControllerTest {
                         "Felipe",
                         "Abda Street",
                         478);
-        ownerRepository.save(owner);
-        petRepository.save(Pet.of("Tex", "-", "-", owner));
+        var caregiver = Caregiver.of(new Telephone("12345678910"), new Email("a@t2.com"), "Marcia");
+        this.caregiverRepository.save(caregiver);
+        this.ownerRepository.save(owner);
+        this.petRepository.save(Pet.of("Tex", "-", "-", owner));
     }
 
-    @Test
     @DisplayName("Should create an walking")
+    @Test
     public void testCreateValidWalking() throws Exception {
-        var createWalkRequest = this.createRequest(30, "-", "-", Collections.singletonList(1L));
+        var createWalkRequest =
+                TestFactory.createWalkRequest(30, "-", "-", Collections.singletonList(1L));
         var response =
                 this.mockMvc
                         .perform(
@@ -85,11 +87,11 @@ public class WalkingControllerTest {
         assertEquals("null", jsonResponse.get("finishDate").toString());
     }
 
-    @Test
     @DisplayName(
             "Create walking with one, or more pets, that were not found in database should throw an exception")
+    @Test
     public void testNotFoundPets() throws Exception {
-        var createWalkRequest = this.createRequest(60, "-", "-", Arrays.asList(1L, 2L));
+        var createWalkRequest = TestFactory.createWalkRequest(60, "-", "-", Arrays.asList(1L, 2L));
         var response =
                 this.mockMvc
                         .perform(
@@ -104,9 +106,35 @@ public class WalkingControllerTest {
         assertEquals("One or more pets were not found", jsonResponse.getString("message"));
     }
 
-    private CreateWalkRequest createRequest(
-            int duration, String latitude, String longitude, List<Long> pets) {
-        var scheduledDate = LocalDateTime.now().plusDays(3).truncatedTo(ChronoUnit.SECONDS);
-        return new CreateWalkRequest(scheduledDate, duration, latitude, longitude, pets);
+    @DisplayName("Should accept walk and change status to ACCEPTED")
+    @Test
+    public void testAcceptWalk() throws Exception {
+        var pets = this.petRepository.findAll();
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingInsert = this.walkingRepository.save(walking);
+        this.mockMvc.perform(get("/api/v1/walk/accept/1")).andExpect(status().isOk());
+        var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
+        assertEquals(WalkingStatus.ACCEPTED, walkingRow.getStatus());
+    }
+
+    @DisplayName(
+            "Try to accept already accepted or canceled walk should return bad request and not change status")
+    @Test
+    public void testTryToAcceptAlreadyAcceptedOrCanceledWalk() throws Exception {
+        var pets = this.petRepository.findAll();
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingInsert = this.walkingRepository.save(walking);
+        walkingInsert.acceptWalk(this.loadLoggedUser.loadLoggedUser());
+        this.walkingRepository.save(walkingInsert);
+        var response =
+                this.mockMvc
+                        .perform(get("/api/v1/walk/accept/1"))
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
+        var json = new JSONObject(response.getResponse().getContentAsString());
+        assertEquals("This walk was already accepted or canceled", json.getString("message"));
+        assertFalse(json.getBoolean("success"));
     }
 }
