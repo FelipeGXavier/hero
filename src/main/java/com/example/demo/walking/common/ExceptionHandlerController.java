@@ -10,9 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionHandlerController {
 
-    @ExceptionHandler(value = {IllegalStateException.class, IllegalArgumentException.class})
+    @ExceptionHandler(value = {IllegalStateException.class, IllegalArgumentException.class, EntityNotFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleRuntimeException(RuntimeException ex) {
+        return new ErrorResponse(ex.getMessage(), false);
+    }
+
+    @ExceptionHandler(PermissionDeniedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handlePermissionDeniedException(PermissionDeniedException ex) {
         return new ErrorResponse(ex.getMessage(), false);
     }
 

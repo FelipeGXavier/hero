@@ -9,13 +9,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class WalkingTest {
@@ -115,5 +115,33 @@ public class WalkingTest {
         var ex2 = assertThrows(IllegalStateException.class, () -> walking.acceptWalk(caregiver));
         assertEquals("This walk was already accepted or canceled", ex2.getMessage());
         assertEquals(WalkingStatus.CANCELED, walking.getStatus());
+    }
+
+    @DisplayName("Should start walking")
+    @Test
+    public void testStartWalking() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        walking.acceptWalk(caregiver);
+        assertNull(walking.getStartDate());
+        walking.startWalk();
+        assertNotNull(walking.getStartDate());
+        var truncatedDate = walking.getStartDate().truncatedTo(ChronoUnit.DAYS);
+        var nowTruncated = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+        assertEquals(nowTruncated, truncatedDate);
+    }
+
+    @DisplayName("Try to start walking with null caregiver, already started walk or already finished, should throw an exception")
+    @Test
+    public void testStartWalkingInconsistentState() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking = TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        assertThrows(IllegalStateException.class, walking::startWalk);
+        walking.acceptWalk(caregiver);
+        walking.startWalk();
+        assertThrows(IllegalStateException.class, walking::startWalk);
     }
 }

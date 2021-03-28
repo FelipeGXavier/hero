@@ -1,7 +1,6 @@
 package com.example.demo.integration.walking;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -113,7 +112,7 @@ public class WalkingControllerTest {
         var walking =
                 TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
         var walkingInsert = this.walkingRepository.save(walking);
-        this.mockMvc.perform(get("/api/v1/walk/accept/1")).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/v1/walk/accept/" + walkingInsert.getId())).andExpect(status().isOk());
         var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
         assertEquals(WalkingStatus.ACCEPTED, walkingRow.getStatus());
     }
@@ -130,11 +129,64 @@ public class WalkingControllerTest {
         this.walkingRepository.save(walkingInsert);
         var response =
                 this.mockMvc
-                        .perform(get("/api/v1/walk/accept/1"))
+                        .perform(get("/api/v1/walk/accept/" + walkingInsert.getId()))
                         .andExpect(status().isBadRequest())
                         .andReturn();
         var json = new JSONObject(response.getResponse().getContentAsString());
         assertEquals("This walk was already accepted or canceled", json.getString("message"));
         assertFalse(json.getBoolean("success"));
+        var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
+        assertEquals(WalkingStatus.ACCEPTED, walkingRow.getStatus());
+    }
+
+    @DisplayName("Test start walking")
+    @Test
+    public void testStartWalking() throws Exception {
+        var pets = this.petRepository.findAll();
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingInsert = this.walkingRepository.save(walking);
+        walkingInsert.acceptWalk(this.loadLoggedUser.loadLoggedUser());
+        this.walkingRepository.save(walkingInsert);
+        this.mockMvc.perform(get("/api/v1/walk/start/" + walkingInsert.getId())).andExpect(status().isOk());
+        var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
+        assertNotNull(walkingRow.getStartDate());
+        assertNull(walkingRow.getFinishDate());
+    }
+
+    @DisplayName(
+            "Try to start walking with null caregiver or nonexistent walking should return an response error and not change walking atributes")
+    @Test
+    public void testStartWalkingWithoutCaregiverOrNonexistentWalking() throws Exception {
+        var responseNonexistentWalking =
+                this.mockMvc
+                        .perform(get("/api/v1/walk/start/0"))
+                        .andExpect(status().isBadRequest())
+                        .andReturn();
+        var jsonNonexistentWalking =
+                new JSONObject(responseNonexistentWalking.getResponse().getContentAsString());
+        assertEquals(
+                "Walking not found, was not possible to start the walking",
+                jsonNonexistentWalking.getString("message"));
+        assertFalse(jsonNonexistentWalking.getBoolean("success"));
+
+        var pets = this.petRepository.findAll();
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingInsert = this.walkingRepository.save(walking);
+        var responseNullCaregiver =
+                this.mockMvc
+                        .perform(get("/api/v1/walk/start/" + walkingInsert.getId()))
+                        .andExpect(status().isUnauthorized())
+                        .andReturn();
+        var jsonNullCaregiver =
+                new JSONObject(responseNullCaregiver.getResponse().getContentAsString());
+        assertEquals(
+                "You are not the responsible for this walking",
+                jsonNullCaregiver.getString("message"));
+        assertFalse(jsonNullCaregiver.getBoolean("success"));
+        var walkingRow = this.walkingRepository.findById(walkingInsert.getId()).get();
+        assertNull(walkingRow.getStartDate());
+        assertNull(walkingRow.getFinishDate());
     }
 }
