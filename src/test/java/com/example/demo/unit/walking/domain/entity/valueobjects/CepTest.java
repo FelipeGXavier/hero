@@ -3,6 +3,8 @@ package com.example.demo.unit.walking.domain.entity.valueobjects;
 import com.example.demo.walking.domain.valueobject.CEP;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,18 +29,11 @@ public class CepTest {
         assertNotEquals(cep1, cep2);
     }
 
-    @DisplayName("CEP without minimum length should throw an exception")
-    @Test
-    public void testCepWithoutMinLength() {
-        var ex = assertThrows(IllegalArgumentException.class, () -> new CEP("8916000"));
-        var message = "CEP must have eight characters without slashes";
-        assertEquals(ex.getMessage(), message);
-    }
-
-    @DisplayName("CEP exceeding eight characters should throw an exception")
-    @Test
-    public void testCepExceedingLength() {
-        var ex = assertThrows(IllegalArgumentException.class, () -> new CEP("891600000"));
+    @DisplayName("CEP with invalid characters should throw and exception")
+    @ParameterizedTest
+    @ValueSource(strings = {"1234567A", "891600000", "8916000"})
+    public void testInvalidCep(String value) {
+        var ex = assertThrows(IllegalArgumentException.class, () -> new CEP(value));
         var message = "CEP must have eight characters without slashes";
         assertEquals(ex.getMessage(), message);
     }
@@ -51,11 +46,5 @@ public class CepTest {
         assertEquals(ex.getMessage(), message);
     }
 
-    @DisplayName("CEP with invalid characters should throw and exception")
-    @Test
-    public void testInvalidCep() {
-        var ex = assertThrows(IllegalArgumentException.class, () -> new CEP("1234567A"));
-        var message = "CEP must have eight characters without slashes";
-        assertEquals(ex.getMessage(), message);
-    }
+
 }
