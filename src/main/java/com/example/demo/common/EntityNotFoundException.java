@@ -1,4 +1,4 @@
-package com.example.demo.walking.common;
+package com.example.demo.common;
 
 public class EntityNotFoundException extends RuntimeException{
 

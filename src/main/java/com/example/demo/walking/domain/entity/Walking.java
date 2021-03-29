@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class Walking {
             this.startDate = LocalDateTime.now();
         } else {
             throw new IllegalStateException(
-                    "Error while starting this walking with id " + this.getId());
+                    "Error while starting this walking");
         }
     }
 
@@ -96,8 +97,15 @@ public class Walking {
             this.finishDate = LocalDateTime.now();
         } else {
             throw new IllegalStateException(
-                    "Error while finishing this walking with id " + this.getId());
+                    "Error while finishing this walking");
         }
+    }
+
+    public int getRealDuration() {
+        if (this.getStartDate() == null || this.getFinishDate() == null) {
+            return 0;
+        }
+        return (int) (Duration.between(this.getStartDate(), this.getFinishDate()).getSeconds()) / 60;
     }
 
     // @TODO Add rules to cancel walk

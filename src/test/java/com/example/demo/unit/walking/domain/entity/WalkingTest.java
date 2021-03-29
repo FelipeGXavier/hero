@@ -100,7 +100,8 @@ public class WalkingTest {
         assertEquals(walking.getStatus(), WalkingStatus.ACCEPTED);
     }
 
-    @DisplayName("Test to try accept a already accepted walk or canceled should throw an exception")
+    @DisplayName(
+            "Attempting to accept a already accepted walk or canceled should throw an exception")
     @Test
     public void testAcceptErrorInvalidState() {
         var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
@@ -177,5 +178,31 @@ public class WalkingTest {
         walking.startWalk();
         walking.finishWalk();
         assertThrows(IllegalStateException.class, walking::finishWalk);
+    }
+
+    @DisplayName("Test calculate real duration")
+    @Test
+    public void testWalkingDuration() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var walkingSpy = spy(walking);
+        when(walkingSpy.getStartDate()).thenReturn(LocalDateTime.now());
+        when(walkingSpy.getFinishDate()).thenReturn(LocalDateTime.now().plusMinutes(30));
+        var duration = walkingSpy.getRealDuration();
+        assertEquals(30, duration);
+    }
+
+    @DisplayName("Test calculate real duration with null dates should return zero")
+    @Test
+    public void testWalkingDurationNullDates() {
+        var pets = Arrays.asList(mock(Pet.class), mock(Pet.class));
+        var walking =
+                TestFactory.createWalking(LocalDateTime.now().plusDays(1L), "-", "-", 30, pets);
+        var caregiver = mock(Caregiver.class);
+        assertEquals(0, walking.getRealDuration());
+        walking.acceptWalk(caregiver);
+        walking.startWalk();
+        assertEquals(0, walking.getRealDuration());
     }
 }

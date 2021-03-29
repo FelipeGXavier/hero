@@ -1,11 +1,8 @@
 package com.example.demo.walking.infra.http;
 
 import com.example.demo.walking.adapters.CreateWalkRequest;
-import com.example.demo.walking.common.LoadLoggedUser;
-import com.example.demo.walking.domain.usecase.AssignCaregiverToWalkingUseCase;
-import com.example.demo.walking.domain.usecase.CreateWalkingUseCase;
-import com.example.demo.walking.domain.usecase.FinishWalkingUseCase;
-import com.example.demo.walking.domain.usecase.StartWalkingUseCase;
+import com.example.demo.common.LoadLoggedUser;
+import com.example.demo.walking.domain.usecase.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +19,7 @@ public class WalkingController {
     private final AssignCaregiverToWalkingUseCase acceptWalking;
     private final FinishWalkingUseCase finishWalking;
     private final StartWalkingUseCase startWalking;
+    private final ShowWalkingUseCase showWalkingUseCase;
     private final LoadLoggedUser loadLoggedUser;
 
     @Autowired
@@ -30,11 +28,13 @@ public class WalkingController {
             AssignCaregiverToWalkingUseCase acceptWalking,
             FinishWalkingUseCase finishWalking,
             StartWalkingUseCase startWalking,
+            ShowWalkingUseCase showWalkingUseCase,
             LoadLoggedUser loadLoggedUser) {
         this.createWalking = createWalking;
         this.acceptWalking = acceptWalking;
         this.finishWalking = finishWalking;
         this.startWalking = startWalking;
+        this.showWalkingUseCase = showWalkingUseCase;
         this.loadLoggedUser = loadLoggedUser;
     }
 
@@ -66,5 +66,12 @@ public class WalkingController {
         var loggedCaregiver = this.loadLoggedUser.loadLoggedUser();
         this.finishWalking.finish(loggedCaregiver, id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/show/{id}")
+    @Transactional
+    public ResponseEntity<?> show(@PathVariable("id") Long id) {
+        var duration = this.showWalkingUseCase.show(id);
+        return new ResponseEntity<>(duration, HttpStatus.OK);
     }
 }

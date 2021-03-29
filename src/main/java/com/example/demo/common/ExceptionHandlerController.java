@@ -1,4 +1,4 @@
-package com.example.demo.walking.common;
+package com.example.demo.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

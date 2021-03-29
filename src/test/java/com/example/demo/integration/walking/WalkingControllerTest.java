@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.demo.util.TestFactory;
-import com.example.demo.walking.common.LoadLoggedUser;
+import com.example.demo.common.LoadLoggedUser;
 import com.example.demo.walking.domain.entity.*;
 import com.example.demo.walking.domain.valueobject.CEP;
 import com.example.demo.walking.domain.valueobject.Email;

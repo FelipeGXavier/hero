@@ -1,14 +1,12 @@
 package com.example.demo.unit.walking.domain.usecase;
 
 import com.example.demo.util.TestFactory;
-import com.example.demo.walking.application.usecases.AcceptWalking;
 import com.example.demo.walking.application.usecases.StartWalking;
-import com.example.demo.walking.common.EntityNotFoundException;
-import com.example.demo.walking.common.PermissionDeniedException;
+import com.example.demo.common.EntityNotFoundException;
+import com.example.demo.common.PermissionDeniedException;
 import com.example.demo.walking.domain.entity.Caregiver;
 import com.example.demo.walking.domain.entity.Pet;
 import com.example.demo.walking.domain.entity.WalkingStatus;
-import com.example.demo.walking.domain.usecase.AssignCaregiverToWalkingUseCase;
 import com.example.demo.walking.domain.usecase.StartWalkingUseCase;
 import com.example.demo.walking.infra.repository.WalkingRepository;
 import org.junit.jupiter.api.DisplayName;

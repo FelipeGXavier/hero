@@ -1,4 +1,4 @@
-package com.example.demo.walking.common;
+package com.example.demo.common;
 
 public class PermissionDeniedException extends RuntimeException{
 

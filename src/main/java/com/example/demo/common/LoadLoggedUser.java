@@ -1,4 +1,4 @@
-package com.example.demo.walking.common;
+package com.example.demo.common;
 
 import com.example.demo.walking.domain.entity.Caregiver;
 import com.example.demo.walking.infra.repository.CaregiverRepository;

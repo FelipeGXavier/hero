@@ -1,31 +1,31 @@
 package com.example.demo.walking.application.usecases;
 
 import com.example.demo.common.EntityNotFoundException;
-import com.example.demo.walking.domain.entity.Caregiver;
-import com.example.demo.walking.domain.usecase.AssignCaregiverToWalkingUseCase;
+import com.example.demo.walking.domain.usecase.ShowWalkingUseCase;
 import com.example.demo.walking.infra.repository.WalkingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AcceptWalking implements AssignCaregiverToWalkingUseCase {
+public class ShowWalking implements ShowWalkingUseCase {
 
-    private WalkingRepository walkingRepository;
+    private final WalkingRepository walkingRepository;
 
     @Autowired
-    public AcceptWalking(WalkingRepository walkingRepository) {
+    public ShowWalking(WalkingRepository walkingRepository) {
         this.walkingRepository = walkingRepository;
     }
 
     @Override
-    public void acceptWalking(Caregiver caregiver, Long walkingId) {
+    public int show(Long id) {
         var walking =
                 this.walkingRepository
-                        .findById(walkingId)
+                        .findById(id)
                         .orElseThrow(
                                 () ->
                                         new EntityNotFoundException(
-                                                "Walking not found, was not possible to accept this walk"));
-        walking.acceptWalk(caregiver);
+                                                "Walking not found, was not possible to get real duration"));
+
+        return walking.getRealDuration();
     }
 }

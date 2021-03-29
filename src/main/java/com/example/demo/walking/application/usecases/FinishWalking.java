@@ -1,7 +1,7 @@
 package com.example.demo.walking.application.usecases;
 
-import com.example.demo.walking.common.EntityNotFoundException;
-import com.example.demo.walking.common.PermissionDeniedException;
+import com.example.demo.common.EntityNotFoundException;
+import com.example.demo.common.PermissionDeniedException;
 import com.example.demo.walking.domain.entity.Caregiver;
 import com.example.demo.walking.domain.usecase.FinishWalkingUseCase;
 import com.example.demo.walking.infra.repository.WalkingRepository;
