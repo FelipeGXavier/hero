@@ -28,7 +28,12 @@ public class SearchWalking implements SearchWalkingUseCase<WalkingResponse> {
     @Override
     public WalkingResponse search(boolean next, int offset) {
         Pageable pageable = PageRequest.of(offset, 10);
-        var result = this.walkingRepository.findAll(pageable);
+        Page<Walking> result;
+        if (next) {
+            result = this.walkingRepository.findAllGreaterThanToday(pageable);
+        } else {
+            result = this.walkingRepository.findAll(pageable);
+        }
         return this.presenter.handle(result);
     }
 }
