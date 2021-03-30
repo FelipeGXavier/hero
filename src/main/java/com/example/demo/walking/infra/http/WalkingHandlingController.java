@@ -13,7 +13,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/walk")
-public class WalkingController {
+public class WalkingHandlingController {
 
     private final CreateWalkingUseCase createWalking;
     private final AssignCaregiverToWalkingUseCase acceptWalking;
@@ -23,7 +23,7 @@ public class WalkingController {
     private final LoadLoggedUser loadLoggedUser;
 
     @Autowired
-    public WalkingController(
+    public WalkingHandlingController(
             CreateWalkingUseCase createWalking,
             AssignCaregiverToWalkingUseCase acceptWalking,
             FinishWalkingUseCase finishWalking,
@@ -66,12 +66,5 @@ public class WalkingController {
         var loggedCaregiver = this.loadLoggedUser.loadLoggedUser();
         this.finishWalking.finish(loggedCaregiver, id);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/show/{id}")
-    @Transactional
-    public ResponseEntity<?> show(@PathVariable("id") Long id) {
-        var duration = this.showWalkingUseCase.show(id);
-        return new ResponseEntity<>(duration, HttpStatus.OK);
     }
 }
