@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ public class WalkingInformationController {
     }
 
     @GetMapping("/show/{id}")
+    @ApiOperation(value = "Get real duration  of an walking")
     @Transactional
     public ResponseEntity<?> show(@PathVariable("id") Long id) {
         var duration = this.showWalking.show(id);
@@ -38,6 +40,7 @@ public class WalkingInformationController {
     }
 
     @GetMapping("index")
+    @ApiOperation(value = "Get walkings")
     public ResponseEntity<?> search(
             @RequestParam(value = "next", required = false) boolean next,
             @RequestParam(value = "page") int page)

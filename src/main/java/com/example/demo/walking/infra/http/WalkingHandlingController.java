@@ -3,6 +3,7 @@ package com.example.demo.walking.infra.http;
 import com.example.demo.common.LoadLoggedUser;
 import com.example.demo.walking.adapters.CreateWalkRequest;
 import com.example.demo.walking.domain.usecase.*;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +40,14 @@ public class WalkingHandlingController {
     }
 
     @PostMapping
+    @ApiOperation(value = "Create a new walking")
     public ResponseEntity<?> createWalk(@RequestBody @Valid CreateWalkRequest request) {
         var walking = this.createWalking.create(request);
         return new ResponseEntity<>(walking, HttpStatus.CREATED);
     }
 
     @GetMapping("/accept/{id}")
+    @ApiOperation(value = "Accept a walking")
     @Transactional
     public ResponseEntity<?> acceptWalk(@PathVariable Long id) {
         var loggedCaregiver = this.loadLoggedUser.loadLoggedUser();
@@ -53,6 +56,7 @@ public class WalkingHandlingController {
     }
 
     @GetMapping("/start/{id}")
+    @ApiOperation(value = "Start a walking")
     @Transactional
     public ResponseEntity<?> startWalk(@PathVariable("id") Long id) {
         var loggedCaregiver = this.loadLoggedUser.loadLoggedUser();
@@ -61,6 +65,7 @@ public class WalkingHandlingController {
     }
 
     @GetMapping("/finish/{id}")
+    @ApiOperation(value = "Finish a walking")
     @Transactional
     public ResponseEntity<?> finishWalk(@PathVariable("id") Long id) {
         var loggedCaregiver = this.loadLoggedUser.loadLoggedUser();
