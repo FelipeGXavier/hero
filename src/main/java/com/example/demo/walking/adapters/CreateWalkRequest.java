@@ -4,7 +4,6 @@ import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.infra.repository.PetRepository;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

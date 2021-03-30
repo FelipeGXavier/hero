@@ -1,7 +1,8 @@
 package com.example.demo.walking.infra.http;
 
 import com.example.demo.walking.adapters.WalkingResponse;
-import com.example.demo.walking.domain.usecase.*;
+import com.example.demo.walking.domain.usecase.SearchWalkingUseCase;
+import com.example.demo.walking.domain.usecase.ShowWalkingUseCase;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;

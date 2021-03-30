@@ -6,7 +6,6 @@ import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.domain.usecase.SearchWalkingUseCase;
 import com.example.demo.walking.infra.repository.WalkingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

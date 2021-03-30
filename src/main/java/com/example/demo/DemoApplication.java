@@ -14,8 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.util.List;
-
 @SpringBootApplication
 @EnableJpaRepositories
 public class DemoApplication {

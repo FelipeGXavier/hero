@@ -1,4 +1,4 @@
-package com.example.demo.walking.infra.mappers;
+package com.example.demo.walking.infra.converters;
 
 import com.example.demo.walking.domain.valueobject.CEP;
 

@@ -2,8 +2,8 @@ package com.example.demo.walking.domain.entity;
 
 import com.example.demo.walking.domain.valueobject.Email;
 import com.example.demo.walking.domain.valueobject.Telephone;
-import com.example.demo.walking.infra.mappers.EmailConverter;
-import com.example.demo.walking.infra.mappers.TelephoneConverter;
+import com.example.demo.walking.infra.converters.EmailConverter;
+import com.example.demo.walking.infra.converters.TelephoneConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

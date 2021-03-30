@@ -1,7 +1,7 @@
 package com.example.demo.walking.infra.http;
 
-import com.example.demo.walking.adapters.CreateWalkRequest;
 import com.example.demo.common.LoadLoggedUser;
+import com.example.demo.walking.adapters.CreateWalkRequest;
 import com.example.demo.walking.domain.usecase.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
