@@ -1,4 +1,4 @@
-package com.example.demo.walking.adapters;
+package com.example.demo.walking.infra.data;
 
 import lombok.Builder;
 

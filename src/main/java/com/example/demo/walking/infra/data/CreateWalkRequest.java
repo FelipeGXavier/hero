@@ -1,4 +1,4 @@
-package com.example.demo.walking.adapters;
+package com.example.demo.walking.infra.data;
 
 import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.infra.repository.PetRepository;

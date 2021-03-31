@@ -1,8 +1,8 @@
 package com.example.demo;
 
 import com.example.demo.common.Presenter;
-import com.example.demo.walking.adapters.SearchWalkingPresenter;
-import com.example.demo.walking.adapters.WalkingResponse;
+import com.example.demo.walking.presentation.SearchWalkingPresenter;
+import com.example.demo.walking.infra.data.WalkingResponse;
 import com.example.demo.walking.application.usecases.SearchWalking;
 import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.domain.usecase.SearchWalkingUseCase;

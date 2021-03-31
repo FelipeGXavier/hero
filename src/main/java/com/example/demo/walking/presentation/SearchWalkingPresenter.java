@@ -1,6 +1,8 @@
-package com.example.demo.walking.adapters;
+package com.example.demo.walking.presentation;
 
 import com.example.demo.common.Presenter;
+import com.example.demo.walking.infra.data.PetResponse;
+import com.example.demo.walking.infra.data.WalkingResponse;
 import com.example.demo.walking.domain.entity.Walking;
 import org.springframework.data.domain.Page;
 
@@ -16,7 +18,8 @@ public class SearchWalkingPresenter implements Presenter<Page<Walking>, WalkingR
         result.setCurrentPage(input.getNumber());
         result.setTotalElements((int) input.getTotalElements());
         result.setTotalPages(input.getTotalPages());
-        var builder = new WalkingResponse.WalkingPayload.WalkingPayloadBuilder();
+
+        var builder = WalkingResponse.WalkingPayload.builder();
         input.getContent()
                 .forEach(
                         walking -> {
@@ -30,8 +33,14 @@ public class SearchWalkingPresenter implements Presenter<Page<Walking>, WalkingR
                                                             ? caregiver.getTelephone().getValue()
                                                             : null)
                                             .scheduledDate(walking.getScheduledDate().toString())
-                                            .startDate(walking.getStartDate() != null ? walking.getStartDate().toString() : null)
-                                            .finishDate(walking.getFinishDate()  != null ? walking.getFinishDate().toString() : null)
+                                            .startDate(
+                                                    walking.getStartDate() != null
+                                                            ? walking.getStartDate().toString()
+                                                            : null)
+                                            .finishDate(
+                                                    walking.getFinishDate() != null
+                                                            ? walking.getFinishDate().toString()
+                                                            : null)
                                             .realDuration(walking.getRealDuration())
                                             .price(walking.getPrice())
                                             .longitude(walking.getLongitude())
@@ -41,7 +50,7 @@ public class SearchWalkingPresenter implements Presenter<Page<Walking>, WalkingR
                                     .forEach(
                                             pet ->
                                                     pets.add(
-                                                            new PetResponse.PetResponseBuilder()
+                                                            PetResponse.builder()
                                                                     .id(pet.getId())
                                                                     .name(pet.getName())
                                                                     .breed(pet.getBreed())

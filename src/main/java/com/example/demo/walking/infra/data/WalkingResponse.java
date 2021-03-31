@@ -1,6 +1,7 @@
-package com.example.demo.walking.adapters;
+package com.example.demo.walking.infra.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class WalkingResponse {
     @JsonProperty(value = "data")
     private List<WalkingPayload> walkingPayloads;
 
-    @Builder
+    @Builder(access = AccessLevel.PUBLIC)
     public static class WalkingPayload implements Serializable {
 
         private final Long id;

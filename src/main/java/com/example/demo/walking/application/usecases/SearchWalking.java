@@ -1,7 +1,7 @@
 package com.example.demo.walking.application.usecases;
 
 import com.example.demo.common.Presenter;
-import com.example.demo.walking.adapters.WalkingResponse;
+import com.example.demo.walking.infra.data.WalkingResponse;
 import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.domain.usecase.SearchWalkingUseCase;
 import com.example.demo.walking.infra.repository.WalkingRepository;

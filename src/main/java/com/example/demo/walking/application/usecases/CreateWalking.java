@@ -1,6 +1,6 @@
 package com.example.demo.walking.application.usecases;
 
-import com.example.demo.walking.adapters.CreateWalkRequest;
+import com.example.demo.walking.infra.data.CreateWalkRequest;
 import com.example.demo.walking.domain.entity.Walking;
 import com.example.demo.walking.domain.usecase.CreateWalkingUseCase;
 import com.example.demo.walking.infra.repository.PetRepository;
