@@ -1,5 +1,6 @@
 package com.example.demo.walking.domain.entity;
 
+import com.example.demo.walking.domain.service.WalkingPriceCalculator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -17,10 +18,10 @@ import java.util.List;
 @Getter
 public class Walking {
 
-    static final int THIRTY_MINUTES_WALKING_BASE_PRICE = 25;
-    static final int SIXTY_MINUTES_WALKING_BASE_PRICE = 35;
-    static final int THIRTY_MINUTES_WALKING_ADDITIONAL_PRICE = 15;
-    static final int SIXTY_MINUTES_WALKING_ADDITIONAL_PRICE = 20;
+    public static final int THIRTY_MINUTES_WALKING_BASE_PRICE = 25;
+    public static final int SIXTY_MINUTES_WALKING_BASE_PRICE = 35;
+    public static final int THIRTY_MINUTES_WALKING_ADDITIONAL_PRICE = 15;
+    public static final int SIXTY_MINUTES_WALKING_ADDITIONAL_PRICE = 20;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,8 +85,7 @@ public class Walking {
                 && this.caregiver != null) {
             this.startDate = LocalDateTime.now();
         } else {
-            throw new IllegalStateException(
-                    "Error while starting this walking");
+            throw new IllegalStateException("Error while starting this walking");
         }
     }
 
@@ -96,8 +96,7 @@ public class Walking {
                 && this.caregiver != null) {
             this.finishDate = LocalDateTime.now();
         } else {
-            throw new IllegalStateException(
-                    "Error while finishing this walking");
+            throw new IllegalStateException("Error while finishing this walking");
         }
     }
 
@@ -105,7 +104,8 @@ public class Walking {
         if (this.getStartDate() == null || this.getFinishDate() == null) {
             return 0;
         }
-        return (int) (Duration.between(this.getStartDate(), this.getFinishDate()).getSeconds()) / 60;
+        return (int) (Duration.between(this.getStartDate(), this.getFinishDate()).getSeconds())
+                / 60;
     }
 
     // @TODO Add rules to cancel walk
@@ -114,24 +114,7 @@ public class Walking {
     }
 
     private double calculateWalkingPrice() {
-        var total = 0.0;
-        var pets = this.pets.size();
-        var duration = this.duration;
-        var additionalPets = pets - 1;
-        if (duration == 30) {
-            total = THIRTY_MINUTES_WALKING_BASE_PRICE;
-            total +=
-                    additionalPets > 0
-                            ? additionalPets * THIRTY_MINUTES_WALKING_ADDITIONAL_PRICE
-                            : 0.0;
-        } else if (duration == 60) {
-            total = SIXTY_MINUTES_WALKING_BASE_PRICE;
-            total +=
-                    additionalPets > 0
-                            ? additionalPets * SIXTY_MINUTES_WALKING_ADDITIONAL_PRICE
-                            : 0.0;
-        }
-        return total;
+        return new WalkingPriceCalculator().calculate(this.duration, this.pets.size());
     }
 
     public static class WalkingBuilder {
